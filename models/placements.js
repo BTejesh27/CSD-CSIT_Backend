@@ -8,7 +8,8 @@ const placementsSchema = new mongoose.Schema({
   package: { type: Number, required: true }, // salary/package offered
   description: { type: String },
   updatedOn: { type: Date, default: Date.now },
-  imagePath: { type: String } // NEW field for image
+  imageUrl: { type: String }, // File path or URL to image
+  imageName: { type: String } // Original filename
 });
 
 module.exports = mongoose.model("Placement", placementsSchema);
