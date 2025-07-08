@@ -6,7 +6,8 @@ const internshipsSchema = new mongoose.Schema({
   role: { type: String, required: true },
   stipend: { type: Number }, // optional
   description: { type: String },
-  imagePath: { type: String } // NEW field for image
+  imageUrl: { type: String }, // File path or URL to image
+  imageName: { type: String } // Original filename
 });
 
 module.exports = mongoose.model("Internship", internshipsSchema);

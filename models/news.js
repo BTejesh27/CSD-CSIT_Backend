@@ -5,7 +5,8 @@ const newsSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   updatedOn: { type: Date, default: Date.now },
-  imagePath: { type: String } // store image path, not the image itself
+  imageUrl: { type: String }, // File path or URL to image
+  imageName: { type: String } // Original filename
 });
 
 module.exports = mongoose.model("News", newsSchema);
