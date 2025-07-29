@@ -47,6 +47,48 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Edit (update) an event by ID
+router.put("/:id", async (req, res) => {
+  try {
+    let updateData = { ...req.body };
+
+    // Handle image data if present
+    if (req.body.image) {
+      const base64Pattern = /^data:image\/(jpeg|jpg|png|gif|webp);base64,/;
+      if (!base64Pattern.test(req.body.image)) {
+        return res.status(400).send("❌ Invalid image format. Only JPEG, PNG, GIF, and WebP are allowed");
+      }
+      const imageSizeInBytes = (req.body.image.length * 3) / 4;
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (imageSizeInBytes > maxSize) {
+        return res.status(400).send("❌ Image size too large. Maximum 5MB allowed");
+      }
+      updateData.imageUrl = req.body.image;
+      updateData.imageName = req.body.imageName || 'uploaded-image';
+      delete updateData.image;
+    }
+
+    const updatedEvent = await Event.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!updatedEvent) {
+      return res.status(404).send("❌ Event not found");
+    }
+    res.send("✅ Event updated");
+  } catch (err) {
+    res.status(500).send("❌ Error updating event");
+  }
+});
+// Delete an event by ID
+router.delete("/:id", async (req, res) => {
+  try {
+    const deletedEvent = await Event.findByIdAndDelete(req.params.id);
+    if (!deletedEvent) {
+      return res.status(404).send("❌ Event not found");
+    }
+    res.send("✅ Event deleted");
+  } catch (err) {
+    res.status(500).send("❌ Error deleting event");
+  }
+});
 // Bulk upload events
 router.post("/bulk", async (req, res) => {
   try {

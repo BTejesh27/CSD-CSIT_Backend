@@ -78,4 +78,45 @@ router.post("/bulk", async (req, res) => {
   }
 });
 
+// Edit (update) a news item by ID
+router.put("/:id", async (req, res) => {
+  try {
+    let updateData = { ...req.body };
+    if (req.body.image) {
+      const base64Pattern = /^data:image\/(jpeg|jpg|png|gif|webp);base64,/;
+      if (!base64Pattern.test(req.body.image)) {
+        return res.status(400).send("❌ Invalid image format. Only JPEG, PNG, GIF, and WebP are allowed");
+      }
+      const imageSizeInBytes = (req.body.image.length * 3) / 4;
+      const maxSize = 5 * 1024 * 1024;
+      if (imageSizeInBytes > maxSize) {
+        return res.status(400).send("❌ Image size too large. Maximum 5MB allowed");
+      }
+      updateData.imageUrl = req.body.image;
+      updateData.imageName = req.body.imageName || 'uploaded-image';
+      delete updateData.image;
+    }
+    const updatedNews = await News.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!updatedNews) {
+      return res.status(404).send("❌ News item not found");
+    }
+    res.send("✅ News updated");
+  } catch (err) {
+    res.status(500).send("❌ Error updating news");
+  }
+});
+
+// Delete a news item by ID
+router.delete("/:id", async (req, res) => {
+  try {
+    const deletedNews = await News.findByIdAndDelete(req.params.id);
+    if (!deletedNews) {
+      return res.status(404).send("❌ News item not found");
+    }
+    res.send("✅ News deleted");
+  } catch (err) {
+    res.status(500).send("❌ Error deleting news");
+  }
+});
+
 module.exports = router;

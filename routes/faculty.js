@@ -78,4 +78,45 @@ router.post("/bulk", async (req, res) => {
   }
 });
 
+// Edit (update) a faculty member by ID
+router.put("/:id", async (req, res) => {
+  try {
+    let updateData = { ...req.body };
+    if (req.body.image) {
+      const base64Pattern = /^data:image\/(jpeg|jpg|png|gif|webp);base64,/;
+      if (!base64Pattern.test(req.body.image)) {
+        return res.status(400).send("❌ Invalid image format. Only JPEG, PNG, GIF, and WebP are allowed");
+      }
+      const imageSizeInBytes = (req.body.image.length * 3) / 4;
+      const maxSize = 5 * 1024 * 1024;
+      if (imageSizeInBytes > maxSize) {
+        return res.status(400).send("❌ Image size too large. Maximum 5MB allowed");
+      }
+      updateData.imageUrl = req.body.image;
+      updateData.imageName = req.body.imageName || 'uploaded-image';
+      delete updateData.image;
+    }
+    const updatedFaculty = await Faculty.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!updatedFaculty) {
+      return res.status(404).send("❌ Faculty not found");
+    }
+    res.send("✅ Faculty updated");
+  } catch (err) {
+    res.status(500).send("❌ Error updating faculty");
+  }
+});
+
+// Delete a faculty member by ID
+router.delete("/:id", async (req, res) => {
+  try {
+    const deletedFaculty = await Faculty.findByIdAndDelete(req.params.id);
+    if (!deletedFaculty) {
+      return res.status(404).send("❌ Faculty not found");
+    }
+    res.send("✅ Faculty deleted");
+  } catch (err) {
+    res.status(500).send("❌ Error deleting faculty");
+  }
+});
+
 module.exports = router;

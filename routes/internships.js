@@ -78,4 +78,45 @@ router.post("/bulk", async (req, res) => {
   }
 });
 
+// Edit (update) an internship by ID
+router.put("/:id", async (req, res) => {
+  try {
+    let updateData = { ...req.body };
+    if (req.body.image) {
+      const base64Pattern = /^data:image\/(jpeg|jpg|png|gif|webp);base64,/;
+      if (!base64Pattern.test(req.body.image)) {
+        return res.status(400).send("❌ Invalid image format. Only JPEG, PNG, GIF, and WebP are allowed");
+      }
+      const imageSizeInBytes = (req.body.image.length * 3) / 4;
+      const maxSize = 5 * 1024 * 1024;
+      if (imageSizeInBytes > maxSize) {
+        return res.status(400).send("❌ Image size too large. Maximum 5MB allowed");
+      }
+      updateData.imageUrl = req.body.image;
+      updateData.imageName = req.body.imageName || 'uploaded-image';
+      delete updateData.image;
+    }
+    const updatedInternship = await Internship.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!updatedInternship) {
+      return res.status(404).send("❌ Internship not found");
+    }
+    res.send("✅ Internship updated");
+  } catch (err) {
+    res.status(500).send("❌ Error updating internship");
+  }
+});
+
+// Delete an internship by ID
+router.delete("/:id", async (req, res) => {
+  try {
+    const deletedInternship = await Internship.findByIdAndDelete(req.params.id);
+    if (!deletedInternship) {
+      return res.status(404).send("❌ Internship not found");
+    }
+    res.send("✅ Internship deleted");
+  } catch (err) {
+    res.status(500).send("❌ Error deleting internship");
+  }
+});
+
 module.exports = router;

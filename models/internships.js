@@ -5,6 +5,8 @@ const internshipsSchema = new mongoose.Schema({
   company: { type: String, required: true },
   role: { type: String, required: true },
   stipend: { type: Number }, // optional
+      year: { type: Number, required: true },
+
   description: { type: String },
   imageUrl: { type: String }, // File path or URL to image
   imageName: { type: String } // Original filename
