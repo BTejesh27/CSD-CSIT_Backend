@@ -1,3 +1,5 @@
+
+
 require("dotenv").config();
 
 const cors = require("cors");
@@ -10,6 +12,9 @@ const facultyRoutes = require("./routes/faculty");
 const placementRoutes = require("./routes/placements");
 const internshipRoutes = require("./routes/internships");
 const syllabusRoutes = require("./routes/syllabus");
+const projectsRouter = require("./routes/projects");
+const startupsRouter = require("./routes/startups");
+
 
 const app = express();
 app.use(cors());
@@ -31,6 +36,8 @@ app.use("/faculty", facultyRoutes);
 app.use("/placements", placementRoutes);
 app.use("/internships", internshipRoutes);
 app.use("/syllabus", syllabusRoutes);
+app.use("/projects", projectsRouter);
+app.use("/startups", startupsRouter);
 
 app.listen(3000, () => {
   console.log("🚀 Server running at http://localhost:3000");
